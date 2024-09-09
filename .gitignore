@@ -1,0 +1,30 @@
+# Ignore node_modules e lockfiles
+node_modules/
+yarn.lock
+
+# Ignore diretórios de build (pode variar de acordo com seu tsconfig)
+dist/
+build/
+
+# Ignore arquivos de compilação TypeScript
+*.js
+*.js.map
+*.d.ts
+
+# Ignore logs
+logs/
+*.log
+npm-debug.log*
+
+# Ignore arquivos de ambiente
+.env
+.env.local
+.env.*.local
+
+# Ignore configurações de editores (VSCode, IntelliJ, etc.)
+.vscode/
+.idea/
+
+# Ignore caches e arquivos temporários
+*.tmp
+*.swp
