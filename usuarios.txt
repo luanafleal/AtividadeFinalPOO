@@ -1,0 +1,4 @@
+0,eu23@gmail.com,euzinha23,348481111'
+1,we23@gmail.com,weli123,223231'
+2,aninha2024@gmail.com,aninhaSol,23456678912
+3,samira201@gmail.com,samiraSan,23412356789

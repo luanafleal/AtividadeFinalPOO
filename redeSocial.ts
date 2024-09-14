@@ -6,29 +6,30 @@ class RedeSocial{
     private _usuarios: Usuario[] = [];
     private _publicacoes: Publicacao[] = [];
 
-    // 2. a
+    // 2. a - inclusão(usuários)
     adicionarUsuario(usuario: Usuario): void{
-        if(this._usuarios.some(u => u.getId() === usuario.getId() || u.getEmail() === usuario.getEmail())){
+        // 2 - b.i
+        if(this._usuarios.some(u => u.id === usuario.id || u.email === usuario.email)){
             throw new UsuarioJaCadastradoError("Usuário com o mesmo ID ou e-mail já cadastrado.");
         }
         
         this._usuarios.push(usuario);
     }
 
-    //2. a
-    consultarPorUsuarioId(id: string): Usuario {
-        const usuario = this._usuarios.find(u => u.getId() === id);
+    // 2. a - consulta(usuários)
+    consultarPorUsuarioId(id: number): Usuario {
+        const usuario = this._usuarios.find(u => u.id === id);
         if (!usuario) {
             throw new UsuarioNaoEncontradoPorIdError(id);
         }
         return usuario;
     }
 
-    // 2. a
+    // 2. a - consulta(usuários)
     consultarUsuarioPorEmail(email: string): Usuario { 
         let usuarioProcurado!: Usuario;
         for (let i: number = 0; i < this._usuarios.length; i++) {
-            if (this._usuarios[i].getEmail() == email) {
+            if (this._usuarios[i].email == email) {
                 usuarioProcurado = this._usuarios[i];
                 break;
             }
@@ -40,68 +41,78 @@ class RedeSocial{
         return usuarioProcurado;
     }
 
-    // 2. a
+    // 2. a - inclusão(publicação)
     adicionarPublicacao(publicacao: Publicacao): void {
-        if(this._publicacoes.some(p => p.getId() === publicacao.getId())){
+        // 2 - b.i
+        if(this._publicacoes.some(p => p.id === publicacao.id)){
             throw new PublicacaoJaCadastradaError("Publicação com ID já cadastrado.");
         }
         
         this._publicacoes.push(publicacao);
     }
 
-    consultarPublicacaoPorId(id: string): Publicacao | undefined {
-        return this._publicacoes.find(p=>p.getId()=== id);
+    // 2 - a - consulta(publicação)
+    consultarPublicacaoPorId(id: number): Publicacao | undefined {
+        return this._publicacoes.find(p=>p.id === id);
     }
 
-    // c
-    listarPublicacoes(): void {
-       const publisOrdenadas = this._publicacoes.sort((a,b)=>
-       b.getDataHora().getTime() - a.getDataHora().getTime());
-       
-       publisOrdenadas.forEach(pub=>{
-        console.log(`Conteúdo: ${pub.getConteudo()}`);
-        console.log(`Data da publicação: ${pub.getDataHora().toLocaleDateString}`);
-        if (pub instanceof PublicacaoAvancada) {
-            const reacoes = pub['_interacoes'].map((interacao: Interacao) => interacao.getTipoInteracao());
-            console.log(`Reações: ${reacoes.join(", ")}`);
-        }console.log("-".repeat(30));
-       }
-       );
-    }
+    // 2 - c
+    listarPublicacoes(): Publicacao[] {
+        const publisOrdenadas = this._publicacoes.sort((a, b) =>
+            b.dataHora.getTime() - a.dataHora.getTime()
+        );
 
-    // d
-    listarPublicacoesPorUsuario(email: string): void {
-        const usuario = this._usuarios.find(u => u.getEmail() === email);
+        publisOrdenadas.forEach(pub => {
+            console.log(`Conteúdo: ${pub.conteudo}`);
+            console.log(`Data da publicação: ${pub.dataHora.toLocaleDateString()}`);
+            if (pub instanceof PublicacaoAvancada) {
+                const reacoes = pub['_interacoes'].map((interacao: Interacao) => interacao.tipoInteracao);
+                console.log(`Reações: ${reacoes.join(", ")}`);
+            }
+            console.log("-".repeat(30));
+        });
+
+        return publisOrdenadas;
+    }
+    
+
+    //2 - d
+    listarPublicacoesPorUsuario(email: string, exibir: boolean = true): Publicacao[] {
+        const usuario = this._usuarios.find(u => u.email === email);
         if (!usuario) {
             throw new UsuarioNaoEncontradoError("Usuário não encontrado.");
         }
 
-        const publicacoesUsuario = this._publicacoes.filter(p => p.getUsuario().getEmail() === email);
-        const publicacoesOrdenadas = publicacoesUsuario.sort((a, b) => b.getDataHora().getTime() - a.getDataHora().getTime());
+        const publicacoesUsuario = this._publicacoes.filter(p => p.usuario.email === email);
+        const publicacoesOrdenadas = publicacoesUsuario.sort((a, b) => b.dataHora.getTime() - a.dataHora.getTime());
 
-        publicacoesOrdenadas.forEach(pub => {
-            
-            console.log(`Conteúdo: ${pub.getConteudo()}`);
-            console.log(`Data de Publicação: ${pub.getDataHora().toLocaleString()}`);
-            console.log(`Usuario: ${pub.getUsuario}`);
-            
-            if (pub instanceof PublicacaoAvancada) {
-                const reacoes = pub['_interacoes'].map((interacao: Interacao) => interacao.getTipoInteracao());
-                console.log(`Reações: ${reacoes.join(", ")}`);
-            }
-            
-            console.log("-".repeat(30));
-        });
+        if (exibir) {
+            publicacoesOrdenadas.forEach(pub => {
+                console.log(`Conteúdo: ${pub.conteudo}`);
+                console.log(`Data de Publicação: ${pub.dataHora.toLocaleString()}`);
+                console.log(`Usuario: ${pub.usuario.apelido}`);
+                
+                if (pub instanceof PublicacaoAvancada) {
+                    const reacoes = pub['_interacoes'].map((interacao: Interacao) => interacao.tipoInteracao);
+                    console.log(`Reações: ${reacoes.join(", ")}`);
+                }
+                
+                console.log("-".repeat(30));
+            });
+        }
+
+        return publicacoesOrdenadas;
     }
-    // e
-    reagirPublicacao(usuario: Usuario, publicacaoId: string, tipoReacao: TipoInteracao): void {
+
+    // 2 - e
+    reagirPublicacao(idInteracao: number, usuario: Usuario, publicacaoId: number, tipoReacao: TipoInteracao): void {
         const publicacao = this.consultarPublicacaoPorId(publicacaoId);
         if (publicacao instanceof PublicacaoAvancada) {
-            if (publicacao['_interacoes'].some((interacao: Interacao) => interacao.getUsuario().getId() === usuario.getId())) {
+            if (publicacao['_interacoes'].some((interacao: Interacao) => interacao.usuario.id === usuario.id)) {
                 throw new UsuarioJaReagiuError("Usuário já reagiu a esta publicação.");
             }
             const novaInteracao = new Interacao(
-                `${publicacao.getId()}-${usuario.getId()}`, 
+                idInteracao++,
                 publicacao, 
                 tipoReacao, 
                 usuario, 
@@ -109,7 +120,14 @@ class RedeSocial{
             );
             publicacao['_interacoes'].push(novaInteracao);
         } else {
-            throw new PublicacaoNaoEncontradaOuInvalidaError("Publicação não encontrada ou não é uma publicação avançada.");
+            throw new PublicacaoNaoEncontradaOuInvalidaError("\x1b[31m" + "\n !!! Publicação não encontrada ou não é uma publicação avançada."  + "\x1b[0m");
         }
     }
+
+    // Getters
+    get usuarios(): Usuario[] {
+        return this._usuarios;
+    }
 }
+
+export {RedeSocial};

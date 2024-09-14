@@ -13,7 +13,7 @@ class UsuarioJaCadastradoError extends AplicacaoError {
 }
 
 class UsuarioNaoEncontradoPorIdError extends AplicacaoError {
-    constructor(id: string) {
+    constructor(id: number) {
         super(`Usuário não encontrado com ID: ${id}`);
         this.name = "UsuarioNaoEncontradoPorIdError";
     }

@@ -1,66 +1,66 @@
 // 1 - a
 class Usuario {
-    private _id: string;
+    private _id: number;
     private _email: string;
     private _apelido: string;
     private _documento: string;
 
-    constructor (id: string, email: string, apelido: string, documento: string) {
+    constructor (id: number, email: string, apelido: string, documento: string) {
         this._id = id;
         this._email = email;
         this._apelido = apelido;
         this._documento = documento;
     }
 
-    getId(): string {
+    get id(): number {
         return this._id;
     }
 
-    getEmail(): string {
+    get email(): string {
         return this._email;
     }
     
-    getApelido(): string {
+    get apelido(): string {
         return this._apelido;
     }
     
-    getDocumento(): string {
+    get documento(): string {
         return this._documento;
     }
 }
 
-// b
+// 1 - b
 class Publicacao {
-    private _id: string;
+    private _id: number;
     private _usuario: Usuario;
     private _conteudo: string;
     private _dataHora: Date;
 
-    constructor (id: string, usuario: Usuario, conteudo: string, dataHora: Date) {
+    constructor (id: number, usuario: Usuario, conteudo: string, dataHora: Date) {
         this._id = id;
         this._usuario = usuario;
         this._conteudo = conteudo;
         this._dataHora = dataHora;
     }
 
-    getId(): string {
+    get id(): number {
         return this._id;
     }
     
-    getUsuario(): Usuario {
+    get usuario(): Usuario {
         return this._usuario;
     }
     
-    getConteudo(): string {
+    get conteudo(): string {
         return this._conteudo;
     }
     
-    getDataHora(): Date {
+    get dataHora(): Date {
         return this._dataHora;
     }
 }
 
-// c
+//1 - c
 enum TipoInteracao {
     Curtir = 1,
     NaoCurtir = 2,
@@ -68,15 +68,15 @@ enum TipoInteracao {
     Suspresa = 4,
 }
 
-// d
+//  1 - d
 class Interacao {
-    private _id: string;
+    private _id: number;
     private _publicacao: Publicacao;
     private _tipoInteracao: TipoInteracao;
     private _usuario: Usuario;
     private _dataHora: Date;
 
-    constructor (id: string, publicacao: Publicacao, tipoInteracao: TipoInteracao, usuario: Usuario, dataHora: Date) {
+    constructor (id: number, publicacao: Publicacao, tipoInteracao: TipoInteracao, usuario: Usuario, dataHora: Date) {
         this._id = id;
         this._publicacao = publicacao;
         this._tipoInteracao = tipoInteracao;
@@ -84,29 +84,38 @@ class Interacao {
         this._dataHora = dataHora;
     }
 
-    getId(): string {
+    get id(): number {
         return this._id;
     }
 
-    getPublicacao(): Publicacao {
+    get publicacao(): Publicacao {
         return this._publicacao;
     }
     
-    getTipoInteracao(): TipoInteracao {
+    get tipoInteracao(): TipoInteracao {
         return this._tipoInteracao;
     }
     
-    getUsuario(): Usuario {
+    get usuario(): Usuario {
         return this._usuario;
     }
 
-    getDataHora(): Date {
+    get dataHora(): Date {
         return this._dataHora;
     }
 }
 
+// 1 - e
 class PublicacaoAvancada extends Publicacao {
     private _interacoes: Interacao[] = [];
+
+    adicionarInteracao(interacao: Interacao): void {
+        this._interacoes.push(interacao);
+    }
+
+    get interacoes(): Interacao[] {
+        return this._interacoes;
+    }
 }
 
 export {Usuario, Publicacao, TipoInteracao, Interacao, PublicacaoAvancada}
