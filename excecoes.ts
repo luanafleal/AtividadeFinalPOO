@@ -27,6 +27,12 @@ class PublicacaoJaCadastradaError extends AplicacaoError {
     }
 }
 
+class IdPublicacaoNaoEncontradoError extends AplicacaoError {
+    constructor(message: string) {
+        super(message);
+    }
+}
+
 // Para consultarUsuario
 class UsuarioNaoEncontradoError extends AplicacaoError {
     constructor(message: string) {
@@ -50,4 +56,4 @@ class UsuarioJaReagiuError extends AplicacaoError {
     }
 }
 
-export {AplicacaoError, UsuarioJaCadastradoError, UsuarioNaoEncontradoPorIdError, PublicacaoJaCadastradaError, UsuarioNaoEncontradoError, PublicacaoNaoEncontradaOuInvalidaError, UsuarioJaReagiuError}
+export {AplicacaoError, UsuarioJaCadastradoError, UsuarioNaoEncontradoPorIdError, PublicacaoJaCadastradaError, IdPublicacaoNaoEncontradoError, UsuarioNaoEncontradoError, PublicacaoNaoEncontradaOuInvalidaError, UsuarioJaReagiuError}

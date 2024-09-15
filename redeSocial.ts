@@ -1,5 +1,5 @@
-import { Usuario, Publicacao , PublicacaoAvancada, TipoInteracao, Interacao  } from "./modelos";
-import { UsuarioJaCadastradoError, UsuarioNaoEncontradoPorIdError, UsuarioNaoEncontradoError, PublicacaoJaCadastradaError, PublicacaoNaoEncontradaOuInvalidaError , UsuarioJaReagiuError } from "./excecoes";
+import { Usuario, Publicacao , PublicacaoAvancada, TipoInteracao, Interacao, EmojiInteracao  } from "./modelos";
+import { UsuarioJaCadastradoError, UsuarioNaoEncontradoPorIdError, UsuarioNaoEncontradoError, PublicacaoJaCadastradaError, IdPublicacaoNaoEncontradoError, PublicacaoNaoEncontradaOuInvalidaError , UsuarioJaReagiuError } from "./excecoes";
 
 // 2. a 
 class RedeSocial{
@@ -16,16 +16,17 @@ class RedeSocial{
         this._usuarios.push(usuario);
     }
 
-    // 2. a - consulta(usuários)
-    consultarPorUsuarioId(id: number): Usuario {
+    // 2. a - consulta(usuários) - por id
+    consultarUsuarioPorId(id: number): Usuario {
         const usuario = this._usuarios.find(u => u.id === id);
         if (!usuario) {
             throw new UsuarioNaoEncontradoPorIdError(id);
         }
+
         return usuario;
     }
 
-    // 2. a - consulta(usuários)
+    // 2. a - consulta(usuários) - por email
     consultarUsuarioPorEmail(email: string): Usuario { 
         let usuarioProcurado!: Usuario;
         for (let i: number = 0; i < this._usuarios.length; i++) {
@@ -52,8 +53,20 @@ class RedeSocial{
     }
 
     // 2 - a - consulta(publicação)
-    consultarPublicacaoPorId(id: number): Publicacao | undefined {
-        return this._publicacoes.find(p=>p.id === id);
+    consultarPublicacaoPorId(id: number): Publicacao {
+        let publicacaoProcurada!: Publicacao;
+        for (let i: number = 0; i < this._publicacoes.length; i++) {
+            if (this._publicacoes[i].id == id) {
+                publicacaoProcurada = this._publicacoes[i];
+                break;
+            }
+        }
+
+        if (publicacaoProcurada == null) {
+            throw new PublicacaoNaoEncontradaOuInvalidaError('\n!!! Publicação NÃO Encontrada: ' + id);
+        }
+
+        return publicacaoProcurada;
     }
 
     // 2 - c
@@ -61,16 +74,6 @@ class RedeSocial{
         const publisOrdenadas = this._publicacoes.sort((a, b) =>
             b.dataHora.getTime() - a.dataHora.getTime()
         );
-
-        publisOrdenadas.forEach(pub => {
-            console.log(`Conteúdo: ${pub.conteudo}`);
-            console.log(`Data da publicação: ${pub.dataHora.toLocaleDateString()}`);
-            if (pub instanceof PublicacaoAvancada) {
-                const reacoes = pub['_interacoes'].map((interacao: Interacao) => interacao.tipoInteracao);
-                console.log(`Reações: ${reacoes.join(", ")}`);
-            }
-            console.log("-".repeat(30));
-        });
 
         return publisOrdenadas;
     }
@@ -88,6 +91,7 @@ class RedeSocial{
 
         if (exibir) {
             publicacoesOrdenadas.forEach(pub => {
+                console.log(`\nId Publicação: ${pub.id}`);
                 console.log(`Conteúdo: ${pub.conteudo}`);
                 console.log(`Data de Publicação: ${pub.dataHora.toLocaleString()}`);
                 console.log(`Usuario: ${pub.usuario.apelido}`);
@@ -108,17 +112,17 @@ class RedeSocial{
     reagirPublicacao(idInteracao: number, usuario: Usuario, publicacaoId: number, tipoReacao: TipoInteracao): void {
         const publicacao = this.consultarPublicacaoPorId(publicacaoId);
         if (publicacao instanceof PublicacaoAvancada) {
-            if (publicacao['_interacoes'].some((interacao: Interacao) => interacao.usuario.id === usuario.id)) {
+            if (publicacao.interacoes.some((interacao: Interacao) => interacao.usuario.id === usuario.id)) {
                 throw new UsuarioJaReagiuError("Usuário já reagiu a esta publicação.");
             }
             const novaInteracao = new Interacao(
-                idInteracao++,
+                idInteracao,
                 publicacao, 
                 tipoReacao, 
                 usuario, 
                 new Date()
             );
-            publicacao['_interacoes'].push(novaInteracao);
+            publicacao.adicionarInteracao(novaInteracao);
         } else {
             throw new PublicacaoNaoEncontradaOuInvalidaError("\x1b[31m" + "\n !!! Publicação não encontrada ou não é uma publicação avançada."  + "\x1b[0m");
         }

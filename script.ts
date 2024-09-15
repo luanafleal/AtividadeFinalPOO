@@ -9,4 +9,4 @@ appRedeSocial.carregarDadosDoArquivo();
 appRedeSocial.menu();
 
 // Salvar os usuários no arquivo após o término
-appRedeSocial.salvarUsuariosEmArquivo();
+appRedeSocial.salvarDadosEmArquivo();

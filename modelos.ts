@@ -63,10 +63,18 @@ class Publicacao {
 //1 - c
 enum TipoInteracao {
     Curtir = 1,
-    NaoCurtir = 2,
+    Amei = 2,
     Riso = 3,
     Suspresa = 4,
 }
+
+enum EmojiInteracao {
+    "👍" = 1,
+    "❤️ " = 2,
+    "😁" = 3,
+    "😮" = 4,
+}
+
 
 //  1 - d
 class Interacao {
@@ -118,4 +126,4 @@ class PublicacaoAvancada extends Publicacao {
     }
 }
 
-export {Usuario, Publicacao, TipoInteracao, Interacao, PublicacaoAvancada}
+export {Usuario, Publicacao, TipoInteracao, EmojiInteracao, Interacao, PublicacaoAvancada}
