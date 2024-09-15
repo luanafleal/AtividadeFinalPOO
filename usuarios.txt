@@ -3,3 +3,4 @@
 2,aninha2024@gmail.com,aninhaSol,23456678912
 3,samira201@gmail.com,samiraSan,23412356789
 4,rosa@gmail.com,rosaFlor,3425173663
+5,luana@gmail.com,luanaleal,122344556

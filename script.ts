@@ -8,5 +8,5 @@ appRedeSocial.carregarDadosDoArquivo();
 // Exibir o menu interativo para o usuário
 appRedeSocial.menu();
 
-// Salvar os usuários no arquivo após o término
+// Salvar os dados no arquivo após o término
 appRedeSocial.salvarDadosEmArquivo();
