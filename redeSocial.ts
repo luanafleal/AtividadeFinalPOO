@@ -1,5 +1,9 @@
-import { Usuario, Publicacao , PublicacaoAvancada, TipoInteracao, Interacao, EmojiInteracao  } from "./modelos";
-import { UsuarioJaCadastradoError, UsuarioNaoEncontradoPorIdError, UsuarioNaoEncontradoError, PublicacaoJaCadastradaError, IdPublicacaoNaoEncontradoError, PublicacaoNaoEncontradaOuInvalidaError , UsuarioJaReagiuError } from "./excecoes";
+import { Usuario, Publicacao , PublicacaoAvancada, TipoInteracao, Interacao } from "./modelos";
+import {
+    UsuarioJaCadastradoError, UsuarioNaoEncontradoPorIdError, UsuarioNaoEncontradoError,
+    PublicacaoJaCadastradaError, PublicacaoNaoEncontradaOuInvalidaError , UsuarioJaReagiuError,
+    UsuarioSemPermissaoError
+} from "./excecoes";
 
 // 2. a 
 class RedeSocial{
@@ -63,7 +67,7 @@ class RedeSocial{
         }
 
         if (publicacaoProcurada == null) {
-            throw new PublicacaoNaoEncontradaOuInvalidaError('\n!!! Publicação NÃO Encontrada: ' + id);
+            throw new PublicacaoNaoEncontradaOuInvalidaError(`\n!!! Publicação NÃO Encontrada: ${id}\n`);
         }
 
         return publicacaoProcurada;
@@ -126,6 +130,16 @@ class RedeSocial{
         } else {
             throw new PublicacaoNaoEncontradaOuInvalidaError("\x1b[31m" + "\n !!! Publicação não encontrada ou não é uma publicação avançada."  + "\x1b[0m");
         }
+    }
+
+    // 3
+    editarPublicacao(publicacao: Publicacao, novoConteudo: string, usuario: Usuario): void {
+        if (publicacao.usuario.email !== usuario.email) {
+            throw new UsuarioSemPermissaoError("\nErro: Usuário não tem permissão para editar esta publicação.");
+        }
+
+        // Utiliza o método para alterar o conteúdo
+        publicacao.conteudo = novoConteudo;
     }
 
     // Getters

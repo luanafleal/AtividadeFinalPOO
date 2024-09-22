@@ -58,6 +58,10 @@ class Publicacao {
     get dataHora(): Date {
         return this._dataHora;
     }
+
+    set conteudo(novoConteudo: string) {
+        this._conteudo = novoConteudo;
+    }
 }
 
 //1 - c

@@ -56,4 +56,11 @@ class UsuarioJaReagiuError extends AplicacaoError {
     }
 }
 
-export {AplicacaoError, UsuarioJaCadastradoError, UsuarioNaoEncontradoPorIdError, PublicacaoJaCadastradaError, IdPublicacaoNaoEncontradoError, UsuarioNaoEncontradoError, PublicacaoNaoEncontradaOuInvalidaError, UsuarioJaReagiuError}
+class UsuarioSemPermissaoError extends AplicacaoError {
+    constructor(message: string) {
+        super(message);
+        this.name = "UsuarioSemPermissaoError";
+    }
+}
+
+export {AplicacaoError, UsuarioJaCadastradoError, UsuarioNaoEncontradoPorIdError, PublicacaoJaCadastradaError, IdPublicacaoNaoEncontradoError, UsuarioNaoEncontradoError, PublicacaoNaoEncontradaOuInvalidaError, UsuarioJaReagiuError, UsuarioSemPermissaoError}

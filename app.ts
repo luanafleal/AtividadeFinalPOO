@@ -56,6 +56,9 @@ class AppRedeSocial {
                     case "6":
                         this.mostrarPublicacoesUsuario();
                         break;
+                    case "7":
+                        this.editarPublicacao();
+                        break;
                 }
             } catch (e) {
                 if (e instanceof AplicacaoError) {
@@ -77,6 +80,7 @@ class AppRedeSocial {
         console.log("4️⃣  - 💬 Interagir com Publicação");
         console.log("5️⃣  - 👥 Listar Usuários");
         console.log("6️⃣  - 🔍 Ver Publicações de um Usuário");
+        console.log("7️⃣  - ✏️ Editar Publicação");
         console.log("0️⃣  - 🚪 Sair");
 
     }
@@ -225,6 +229,21 @@ class AppRedeSocial {
     private mostrarPublicacoesUsuario() {
         const emailUsuario = this._input("Digite o email do usuário: ");
         this._redeSocial.listarPublicacoesPorUsuario(emailUsuario);
+    }
+
+    // menu - opcao 7
+    private editarPublicacao() {
+        console.log("\n✏️  Editar Publicação\n");
+        const idPublicacao = parseInt(this._input("Digite o ID da publicação que deseja editar: "));
+        const publicacao = this._redeSocial.consultarPublicacaoPorId(idPublicacao);
+
+        const emailUsuario = this._input("Digite o email do usuário que deseja editar a publicação: ");
+        const usuario = this._redeSocial.consultarUsuarioPorEmail(emailUsuario);
+
+        const novoConteudo = this._input("Digite o novo conteúdo da publicação: ");
+        this._redeSocial.editarPublicacao(publicacao, novoConteudo, usuario);
+
+        console.log("\n✅ Publicação editada com sucesso!");
     }
 
     public carregarUsuarios() {
