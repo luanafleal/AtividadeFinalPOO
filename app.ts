@@ -12,6 +12,7 @@ import {
 import { AplicacaoError } from "./excecoes";
 const BOLD = '\x1b[1m';
 const RESET = '\x1b[0m';
+const BLUE = '\x1b[34m'
 
 class AppRedeSocial {
     private _redeSocial: RedeSocial;
@@ -29,8 +30,8 @@ class AppRedeSocial {
     }
     
     menu() {
-        let op: string = "";
 
+        let op: string = "";
         do {
             this.listarOpcoes();
             try {
@@ -60,18 +61,16 @@ class AppRedeSocial {
                 if (e instanceof AplicacaoError) {
                     console.log(e.message); // "Ocorreu um erro na aplicação!"
                 } else {
-                    console.log(
-                        "Erro desconhecido. Contate o administrador",
-                        e
-                    );
+                    console.log("Erro desconhecido. Contate o administrador", e);
                 }
                 this.imprimirPressionarEnter();
             }
+            
         } while (op !== "0");
     }
 
     private listarOpcoes() {
-        console.log("\n##### Menu - Rede Social #####");
+        console.log("\n------ Menu - Rede Social ------");
         console.log("1️⃣  - 👤 Cadastrar Usuário");
         console.log("2️⃣  - 📝 Criar Publicação");
         console.log("3️⃣  - 📜 Listar Publicações");
@@ -92,17 +91,8 @@ class AppRedeSocial {
 
         let usuario = new Usuario(this._idUsuario++, email, apelido, documento);
 
-        try {
-            this._redeSocial.adicionarUsuario(usuario);
-            console.log("\n# 👤 Usuário cadastrado com sucesso!");
-        } catch (error) {
-            // concertar isso aqui
-            if (error instanceof AplicacaoError) {
-                console.log(error.message);
-            } else {
-                console.log("Ocorreu um erro desconhecido.");
-            }
-        }
+        this._redeSocial.adicionarUsuario(usuario);
+        console.log("\n# 👤 Usuário cadastrado com sucesso!");
     }
 
     // menu - opcao 2
@@ -133,48 +123,79 @@ class AppRedeSocial {
     }
 
     // menu - opcao 3
-    private listarPublicacoes(solicitarEnter: boolean = true) {
-        console.log("\n📜 Publicações: \n");
+    private listarPublicacoes() {
         const publicacoes = this._redeSocial.listarPublicacoes();
+        console.log(`${BOLD}\n📜 PUBLICAÇÕES:\n${RESET}`);
 
-        publicacoes.forEach(pub => {
-            console.log(`Publicação(ID): ${pub.id} | Usuário: ${pub.usuario.email} | Data: ${this.formatarDataHora(pub.dataHora)}\nConteúdo: ${BOLD}${pub.conteudo}${RESET}`);
-            if (pub instanceof PublicacaoAvancada) {
-                const reacoes = pub.interacoes.map((interacao: Interacao) => interacao.tipoInteracao).sort();
+        for(let publicacao of publicacoes) {
+            this.imprimirPublicacao(publicacao);
+            console.log("-".repeat(40));
+        }
 
-                let cont = 0;
-                let textoReacoes = '';
+        this.imprimirPressionarEnter();
 
-
-                for (let i = 0; i <= reacoes.length; i++) {
-                    if(i == 0 || reacoes[i] == reacoes[i-1]) {
-                        cont++;
-                    } else {
-                        textoReacoes += `${EmojiInteracao[reacoes[i-1]]} ${cont} `;
-                        cont = 1;
-                    }
-                }
-
-                console.log(textoReacoes);
-
-            }
-            console.log("-".repeat(50));
-        });
+        const desejaInteragir = this._input("\n💌 Deseja interagir com alguma publicação? (S/N): ").toLowerCase();
         
-        if (solicitarEnter) {
-            this.imprimirPressionarEnter();
+        if (desejaInteragir === "s") {
+            this.interagirComPublicacao();
         }
     }
 
+    private imprimirPublicacao(publicacao: Publicacao) {
+        console.log(`${BOLD}ID: ${publicacao.id}${RESET} - Usuário: ${BLUE}${publicacao.usuario.email}${RESET}`);
+        console.log(`Conteúdo: ${BOLD}${publicacao.conteudo}${RESET}`);
+        console.log("Data:", this.formatarDataHora(publicacao.dataHora));
+
+        if(publicacao instanceof PublicacaoAvancada) {
+            this.imprimirInteracoes(publicacao);
+        }
+    }
+
+    private imprimirInteracoes(publicacao: PublicacaoAvancada) {
+        // Exibir Interações
+        if(publicacao.interacoes.length > 0) {
+            const reacoes = publicacao.interacoes.map((interacao: Interacao) => interacao.tipoInteracao).sort();
+
+            let cont = 0;
+            let textoReacoes = '';
+
+            for (let i = 0; i <= reacoes.length; i++) {
+                if (i === 0 || reacoes[i] === reacoes[i - 1]) {
+                    cont++;
+                } else {
+                    textoReacoes += `${EmojiInteracao[reacoes[i - 1]]} ${cont} `;
+                    cont = 1;
+                }
+            }
+            
+            console.log(textoReacoes);
+
+        } else {
+            console.log("> Interações: Nenhuma")
+        }
+    }
+
+    private listarPublicacoesAvancadas() {
+        const publicacoes = this._redeSocial.listarPublicacoes();
+        console.log(`${BOLD}💌 PUBLICAÇÕES AVANÇADAS:\n${RESET}`);
+        for(let publicacao of publicacoes) {
+            if(publicacao instanceof PublicacaoAvancada) {
+                this.imprimirPublicacao(publicacao);
+                console.log("-".repeat(40));
+            }
+        }
+    }
+    
     // menu - opcao 4
     private interagirComPublicacao() {
-        console.log("\n#💬  Interagir\n");
+        console.log("\n💬  Interagir\n");
+        this.listarPublicacoesAvancadas();
         const idPublicacao = this._input("Digite o ID da publicação: ");
         const emailUsuario = this._input("Digite o email do usuário que está interagindo: ");
 
         console.log("\nEscolha a interação:");
         console.log("1 - 👍 Curtir");
-        console.log("2 - ❤️ Amei");
+        console.log("2 - ❤️  Amei");
         console.log("3 - 😁 Riso");
         console.log("4 - 😯 Surpresa");
 
@@ -182,23 +203,11 @@ class AppRedeSocial {
         const tipoInteracao = parseInt(this._input("Digite o número da interação: "));
 
         if (TipoInteracao[tipoInteracao] !== undefined) {
-            try {
-                const usuario = this._redeSocial.consultarUsuarioPorEmail(emailUsuario);
-                if (usuario) {
-                    this._redeSocial.reagirPublicacao(this._idInteracao++, usuario, parseInt(idPublicacao), tipoInteracao);
-                    console.log("Interação realizada com sucesso!");
-                } else {
-                    console.log("Usuário não encontrado.");
-                }
-            } catch (error) {
-                if (error instanceof AplicacaoError) {
-                    console.log(error.message);
-                } else {
-                    console.log("Ocorreu um erro desconhecido.");
-                }
-            }
+            const usuario = this._redeSocial.consultarUsuarioPorEmail(emailUsuario);
+            this._redeSocial.reagirPublicacao(this._idInteracao++, usuario, parseInt(idPublicacao), tipoInteracao);
+            console.log("\n😍 Interação realizada com sucesso!");
         } else {
-            console.log("Número de interação inválido.");
+            console.log("\n!!!! Número de interação inválido.");
         }
     }
 
@@ -215,18 +224,7 @@ class AppRedeSocial {
     // menu - opcao 6
     private mostrarPublicacoesUsuario() {
         const emailUsuario = this._input("Digite o email do usuário: ");
-        try {
-            this._redeSocial.listarPublicacoesPorUsuario(emailUsuario); // Atualize para chamar a função correta
-        } catch (error) {
-            if (error instanceof AplicacaoError) {
-                console.log(error.message);
-            } else {
-                console.log(
-                    "Erro desconhecido. Contate o administrador",
-                    error
-                );
-            }
-        }
+        this._redeSocial.listarPublicacoesPorUsuario(emailUsuario);
     }
 
     public carregarUsuarios() {
@@ -247,25 +245,16 @@ class AppRedeSocial {
 
             let usuario!: Usuario;
             const id = parseInt(linhaUsuario[0]);
-
-            try {
-                usuario = new Usuario(id, linhaUsuario[1], linhaUsuario[2], linhaUsuario[3]);
-
-                if (id >= this._idUsuario) {
-                    this._idUsuario = id + 1;
-                }
-
-                this._redeSocial.adicionarUsuario(usuario);
-
-                console.log(`Usuario ${usuario.email} carregado!`);
-            } catch (error) {
-                if (error instanceof AplicacaoError) {
-                    console.log(`Erro ao processar usuário na linha ${i + 1}: ${error.message}`);
-                } else {
-                    console.log("Erro desconhecido. Contate o administrador", error);
-                }
+            usuario = new Usuario(id, linhaUsuario[1], linhaUsuario[2], linhaUsuario[3]);
+            
+            if (id >= this._idUsuario) {
+                this._idUsuario = id + 1;
             }
+            
+            this._redeSocial.adicionarUsuario(usuario);
+            console.log(`Usuario ${usuario.email} carregado!`);
         }
+        
         console.log("Fim do arquivo");
 
     }
@@ -280,8 +269,7 @@ class AppRedeSocial {
 
         for (let i: number = 0; i < linhas.length; i++) {
             let linhaPublicacao: string[] = linhas[i].trim().split(",");
-            console.log(`Linha Usuario: ${linhaPublicacao}`);
-            console.log(`tamanhoLinha: ${linhaPublicacao.length}`);
+            
             // Verifica se a linha tem o número esperado de colunas
             if (linhaPublicacao.length < 5) {
                 console.warn(`Linha mal formatada: ${linhas[i]}`);
@@ -291,33 +279,24 @@ class AppRedeSocial {
             let publicacao!: Publicacao;
             const idPublicação = parseInt(linhaPublicacao[1]);
 
-            try {
-                const usuario: Usuario = this._redeSocial.consultarUsuarioPorId(parseInt(linhaPublicacao[1]));
+            const usuario: Usuario = this._redeSocial.consultarUsuarioPorId(parseInt(linhaPublicacao[1]));
 
-                let tipo: string = linhaPublicacao[0];
+            let tipo: string = linhaPublicacao[0];
 
-                if ( tipo == 'PA') {
-                    publicacao = new PublicacaoAvancada(idPublicação, usuario, linhaPublicacao[3], new Date(linhaPublicacao[4]));
-                    
-                } else {
-                    publicacao = new Publicacao(idPublicação, usuario, linhaPublicacao[3], new Date(linhaPublicacao[4]));
-                }
-
-                if (idPublicação >= this._idPublicacao) {
-                    this._idPublicacao = idPublicação + 1;
-                }
-
-                this._redeSocial.adicionarPublicacao(publicacao);
-
-                console.log(`Publicaçao ${publicacao.id} carregada!`);
-
-            } catch (error) {
-                if (error instanceof AplicacaoError) {
-                    console.error(`Erro ao processar publicação na linha ${i + 1}: ${error.message}`);
-                } else {
-                    console.error("Erro desconhecido ao processar publicação. Contate o administrador.", error);
-                }
+            if ( tipo == 'PA') {
+                publicacao = new PublicacaoAvancada(idPublicação, usuario, linhaPublicacao[3], new Date(linhaPublicacao[4]));
+                
+            } else {
+                publicacao = new Publicacao(idPublicação, usuario, linhaPublicacao[3], new Date(linhaPublicacao[4]));
             }
+
+            if (idPublicação >= this._idPublicacao) {
+                this._idPublicacao = idPublicação + 1;
+            }
+
+            this._redeSocial.adicionarPublicacao(publicacao);
+
+            console.log(`Publicaçao ${publicacao.id} carregada!`);
         }
 
         console.log("Fim do arquivo");
@@ -332,8 +311,7 @@ class AppRedeSocial {
 
         for (let i: number = 0; i < linhas.length; i++) {
             let linhaInteracoes: string[] = linhas[i].trim().split(",");
-            console.log(`Linha Usuario: ${linhaInteracoes}`);
-            console.log(`tamanhoLinha: ${linhaInteracoes.length}`);
+            
             // Verifica se a linha tem o número esperado de colunas
             if (linhaInteracoes.length < 5) {
                 console.warn(`Linha mal formatada: ${linhas[i]}`);
@@ -344,29 +322,20 @@ class AppRedeSocial {
             
             const idInteracao = parseInt(linhaInteracoes[0]);
 
-            try {
                 
-                const publicacao: PublicacaoAvancada = <PublicacaoAvancada> this._redeSocial.consultarPublicacaoPorId(parseInt(linhaInteracoes[1]));
-                const tipoInteracao = parseInt(linhaInteracoes[2]);
-                const usuario: Usuario = this._redeSocial.consultarUsuarioPorId(parseInt(linhaInteracoes[3]));
+            const publicacao: PublicacaoAvancada = <PublicacaoAvancada> this._redeSocial.consultarPublicacaoPorId(parseInt(linhaInteracoes[1]));
+            const tipoInteracao = parseInt(linhaInteracoes[2]);
+            const usuario: Usuario = this._redeSocial.consultarUsuarioPorId(parseInt(linhaInteracoes[3]));
 
-                interacao = new Interacao(idInteracao, publicacao, tipoInteracao, usuario, new Date(linhaInteracoes[4]));
+            interacao = new Interacao(idInteracao, publicacao, tipoInteracao, usuario, new Date(linhaInteracoes[4]));
                 
-                if (idInteracao >= this._idInteracao) {
-                    this._idInteracao = idInteracao + 1;
-                }
-
-                publicacao.adicionarInteracao(interacao);
-
-                console.log(`Interação ${interacao.id} carregada!`);
-
-            } catch (error) {
-                if (error instanceof AplicacaoError) {
-                    console.error(`Erro ao processar publicação na linha ${i + 1}: ${error.message}`);
-                } else {
-                    console.error("Erro desconhecido ao processar publicação. Contate o administrador.", error);
-                }
+            if (idInteracao >= this._idInteracao) {
+                this._idInteracao = idInteracao + 1;
             }
+
+            publicacao.adicionarInteracao(interacao);
+
+            console.log(`Interação ${interacao.id} carregada!`);
         }
 
         console.log("Fim do arquivo");
@@ -380,41 +349,37 @@ class AppRedeSocial {
 
     // Salvar dados em arquivos (usuarios, publicacoes, interacoes);
     public salvarDadosEmArquivo() {
-        try {
-            let dadosUsuarios = "";
-            let dadosPublicacoes = "";
-            let dadosInteracoes = "";
-            this._redeSocial.usuarios.forEach((usuario) => {
-                // Salvando os dados do usuário
-                dadosUsuarios += `${usuario.id},${usuario.email},${usuario.apelido},${usuario.documento}\n`;
+        let dadosUsuarios = "";
+        let dadosPublicacoes = "";
+        let dadosInteracoes = "";
+        this._redeSocial.usuarios.forEach((usuario) => {
+            // Salvando os dados do usuário
+            dadosUsuarios += `${usuario.id},${usuario.email},${usuario.apelido},${usuario.documento}\n`;
 
-                // Salvando as publicações do usuário
-                const publicacoes = this._redeSocial.listarPublicacoesPorUsuario(usuario.email, false); // Adicione false para não imprimir
-                publicacoes.forEach((pub) => {
-                    let tipo = 'P';
+            // Salvando as publicações do usuário
+            const publicacoes = this._redeSocial.listarPublicacoesPorUsuario(usuario.email, false); // Adicione false para não imprimir
+            publicacoes.forEach((pub) => {
+                let tipo = 'P';
 
-                    if (pub instanceof PublicacaoAvancada) {
-                        tipo = 'PA';
-                    }
+                if (pub instanceof PublicacaoAvancada) {
+                    tipo = 'PA';
+                }
 
-                    dadosPublicacoes += `${tipo},${pub.id},${pub.usuario.id},${pub.conteudo},${pub.dataHora.toISOString()}\n`;
+                dadosPublicacoes += `${tipo},${pub.id},${pub.usuario.id},${pub.conteudo},${pub.dataHora.toISOString()}\n`;
 
-                    // Se a publicação for avançada, salvar as interações
-                    if (pub instanceof PublicacaoAvancada) {
-                        const interacoes = pub.interacoes;
-                        interacoes.forEach((interacao) => {
-                            dadosInteracoes += `${interacao.id},${interacao.publicacao.id},${interacao.tipoInteracao},${interacao.usuario.id},${interacao.dataHora.toISOString()}\n`;
-                        });
-                    }
-                });
+                // Se a publicação for avançada, salvar as interações
+                if (pub instanceof PublicacaoAvancada) {
+                    const interacoes = pub.interacoes;
+                    interacoes.forEach((interacao) => {
+                        dadosInteracoes += `${interacao.id},${interacao.publicacao.id},${interacao.tipoInteracao},${interacao.usuario.id},${interacao.dataHora.toISOString()}\n`;
+                    });
+                }
             });
-            fs.writeFileSync(this.CAMINHO_ARQUIVO_USUARIOS, dadosUsuarios.trim(), "utf-8");
-            fs.writeFileSync(this.CAMINHO_ARQUIVO_PUBLICACOES, dadosPublicacoes.trim(), "utf-8");
-            fs.writeFileSync(this.CAMINHO_ARQUIVO_INTERACOES, dadosInteracoes.trim(), "utf-8");
-            console.log("Dados salvos com sucesso!");
-        } catch (error) {
-            console.log("Erro ao salvar usuários e publicacoes no arquivo:");
-        }
+        });
+        fs.writeFileSync(this.CAMINHO_ARQUIVO_USUARIOS, dadosUsuarios.trim(), "utf-8");
+        fs.writeFileSync(this.CAMINHO_ARQUIVO_PUBLICACOES, dadosPublicacoes.trim(), "utf-8");
+        fs.writeFileSync(this.CAMINHO_ARQUIVO_INTERACOES, dadosInteracoes.trim(), "utf-8");
+        console.log("Dados salvos com sucesso!");
     }
 
     private formatarDataHora(data: Date): string {

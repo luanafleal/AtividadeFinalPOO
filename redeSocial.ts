@@ -36,7 +36,7 @@ class RedeSocial{
             }
         }
         if (usuarioProcurado == null) {
-            throw new UsuarioNaoEncontradoError("Usuário não encontrado com e-mail: " + email);
+            throw new UsuarioNaoEncontradoError(`\n!!! Usuário não encontrado com e-mail: ${email}\n`);
         }
     
         return usuarioProcurado;
@@ -131,6 +131,10 @@ class RedeSocial{
     // Getters
     get usuarios(): Usuario[] {
         return this._usuarios;
+    }
+
+    get publicacoes(): Publicacao[] {
+        return this._publicacoes;
     }
 }
 
