@@ -59,6 +59,9 @@ class AppRedeSocial {
                     case "7":
                         this.editarPublicacao();
                         break;
+                    case "9":
+                        this.transformarPublicacaoEmAvançada();
+                        break;
                 }
             } catch (e) {
                 if (e instanceof AplicacaoError) {
@@ -81,6 +84,7 @@ class AppRedeSocial {
         console.log("5️⃣  - 👥 Listar Usuários");
         console.log("6️⃣  - 🔍 Ver Publicações de um Usuário");
         console.log("7️⃣  - ✏️ Editar Publicação");
+        console.log("9️⃣  - 🔓 Liberar Interações");
         console.log("0️⃣  - 🚪 Sair");
 
     }
@@ -189,6 +193,17 @@ class AppRedeSocial {
             }
         }
     }
+
+    private listarPublicacoesSimples() {
+        const publicacoes = this._redeSocial.listarPublicacoes();
+        console.log(`${BOLD}✉️ PUBLICAÇÕES SIMPLES:\n${RESET}`);
+        for (let publicacao of publicacoes) {
+            if (!(publicacao instanceof PublicacaoAvancada)) {
+                this.imprimirPublicacao(publicacao);
+                console.log("-".repeat(40));
+            }
+        }
+    }
     
     // menu - opcao 4
     private interagirComPublicacao() {
@@ -246,6 +261,20 @@ class AppRedeSocial {
         console.log("\n✅ Publicação editada com sucesso!");
     }
 
+    // menu - opção 9
+    private transformarPublicacaoEmAvançada() {
+        console.log("\n🔄 Transformar Publicação em Avançada\n");
+        
+       this.listarPublicacoesSimples();
+
+        const idPublicacao = parseInt(this._input("Digite o ID da publicação que deseja transformar: "));
+
+        this._redeSocial.transformarPublicacaoEmAvancada(idPublicacao);
+        
+        console.log("\n✅ Publicação transformada em avançada com sucesso!");
+
+    }
+    
     public carregarUsuarios() {
         const arquivo: string = fs.readFileSync(this.CAMINHO_ARQUIVO_USUARIOS, 'utf-8');
         const linhas: string[] = arquivo.split('\n');

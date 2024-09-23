@@ -2,7 +2,7 @@ import { Usuario, Publicacao , PublicacaoAvancada, TipoInteracao, Interacao } fr
 import {
     UsuarioJaCadastradoError, UsuarioNaoEncontradoPorIdError, UsuarioNaoEncontradoError,
     PublicacaoJaCadastradaError, PublicacaoNaoEncontradaOuInvalidaError , UsuarioJaReagiuError,
-    UsuarioSemPermissaoError
+    UsuarioSemPermissaoError, PublicacaoJaEhAvancadaError
 } from "./excecoes";
 
 // 2. a 
@@ -73,6 +73,22 @@ class RedeSocial{
         return publicacaoProcurada;
     }
 
+    consultarPublicacaoPorIndice(numero: number): number {
+        let indiceProcurado: number = -1;
+        for (let i: number = 0; i < this._publicacoes.length; i++) {
+            if (this._publicacoes[i].id == numero) {
+                indiceProcurado = i;
+                break;
+            }
+        }
+
+        if (indiceProcurado == -1) {
+            throw new PublicacaoNaoEncontradaOuInvalidaError(`\nPublicação não encontrada: ${numero}`);
+        }
+
+        return indiceProcurado;
+    }
+
     // 2 - c
     listarPublicacoes(): Publicacao[] {
         const publisOrdenadas = this._publicacoes.sort((a, b) =>
@@ -140,6 +156,26 @@ class RedeSocial{
 
         // Utiliza o método para alterar o conteúdo
         publicacao.conteudo = novoConteudo;
+    }
+
+    // 3
+    transformarPublicacaoEmAvancada(publicacaoId: number) {
+        const publicacao = this.consultarPublicacaoPorId(publicacaoId);
+
+        // Verificar se a publicação já é avançada
+        if (publicacao instanceof PublicacaoAvancada) {
+            throw new PublicacaoJaEhAvancadaError("\x1b[31m" + "\n !!! A publicação já é avançada." + "\x1b[0m");
+        }
+
+        // Criar uma nova publicação avançada com os mesmos dados
+        const publicacaoAvancada = new PublicacaoAvancada(publicacao.id, publicacao.usuario, publicacao.conteudo, publicacao.dataHora);
+
+        // alterarPorIndice
+        let indice = this.consultarPublicacaoPorIndice(publicacaoId);
+
+        if (indice != -1) {
+            this._publicacoes[indice] = publicacaoAvancada;
+        }
     }
 
     // Getters
