@@ -1,6 +1,6 @@
 0,rosa@gmail.com,rosaMaria,348481111,true
 1,luana@gmail.com,luanaleal,223231,true
-2,maria@gmail.com,mariazinha,23456678912,false
+2,maria@gmail.com,mariazinha,23456678912,true
 3,ely@gmail.com,ely2024,23412356789,true
-4,paulo@gmail.com,pauloN,3425173663,true
+4,paulo@gmail.com,pauloN,3425173663,false
 5,lina@gmail.com,lina123,122344556,true

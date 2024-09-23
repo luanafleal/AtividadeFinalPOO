@@ -109,6 +109,7 @@ class AppRedeSocial {
 
         this._redeSocial.adicionarUsuario(usuario);
         console.log("\n✅ Usuário cadastrado com sucesso!");
+        this.imprimirPressionarEnter();
     }
 
     // menu - opcao 2
@@ -144,12 +145,6 @@ class AppRedeSocial {
         }
 
         this.imprimirPressionarEnter();
-
-        const desejaInteragir = this._input("\n💌 Deseja interagir com alguma publicação? (S/N): ").toLowerCase();
-        
-        if (desejaInteragir === "s") {
-            this.interagirComPublicacao();
-        }
     }
 
     private listarPublicacoesAvancadas() {
@@ -197,11 +192,12 @@ class AppRedeSocial {
         } else {
             console.log("\n!!!! Número de interação inválido.");
         }
+        this.imprimirPressionarEnter();
     }
 
     // menu - opcao 5
     private listarUsuarios() {
-        console.log("\n# 👥 Listar Usuários\n");
+        // console.log("\n# 👥 Listar Usuários\n");
         for (let usuario of this._redeSocial.usuarios) {
             console.log(`${usuario.ativo ? "✔️​  Ativo" : "❌​ Inativo"} - Id: ${usuario.id} - Email: ${usuario.email} - Apelido: ${usuario.apelido} - Documento: ${usuario.documento}`);
         }
@@ -213,6 +209,7 @@ class AppRedeSocial {
     private mostrarPublicacoesUsuario() {
         const emailUsuario = this._input("Digite o email do usuário: ");
         this._redeSocial.listarPublicacoesPorUsuario(emailUsuario);
+        this.imprimirPressionarEnter();
     }
 
     // menu - opcao 7
@@ -228,12 +225,13 @@ class AppRedeSocial {
         this._redeSocial.editarPublicacao(publicacao, novoConteudo, usuario);
 
         console.log("\n✅ Publicação editada com sucesso!");
+        this.imprimirPressionarEnter();
     }
 
     // menu - opcao 8
     private alterarStatusUsuario() {
         console.log("\n# 🔄 Ativar/Desativar Usuário\n");
-
+        this.listarUsuarios()
         const emailUsuario = this._input("Digite o email do usuário que deseja alterar: ");
         const usuario = this._redeSocial.consultarUsuarioPorEmail(emailUsuario);
 
@@ -242,6 +240,9 @@ class AppRedeSocial {
         const novoStatus = usuario.ativo ? "ativo" : "inativo";
 
         console.log(`\n✅ O usuário agora está ${novoStatus}.`);
+
+        this.listarUsuarios();
+        this.imprimirPressionarEnter();
     }
 
     // menu - opção 9
@@ -255,12 +256,15 @@ class AppRedeSocial {
         this._redeSocial.transformarPublicacaoEmAvancada(idPublicacao);
         
         console.log("\n✅ Publicação transformada em avançada com sucesso!");
-
+        
+        this.imprimirPressionarEnter();
     }
 
     // menu - opcao 10
     private excluirPublicacao() {
         console.log("\n# 🗑️  Excluir Publicação\n");
+
+        this.listarPublicacoes();
     
         const idPublicacao = parseInt(this._input("Digite o ID da publicação a ser excluída: "));
         const publicacao = this._redeSocial.consultarPublicacaoPorId(idPublicacao);
@@ -270,6 +274,7 @@ class AppRedeSocial {
         this._redeSocial.excluirPublicacao(publicacao, usuario.id);
 
         console.log("\n✅ Publicação excluída com sucesso!");
+        this.imprimirPressionarEnter();
     }
     
     // Métodos de Carregamento de Dados
