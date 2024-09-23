@@ -89,7 +89,6 @@ enum EmojiInteracao {
     "😮" = 4,
 }
 
-
 //  1 - d
 class Interacao {
     private _id: number;

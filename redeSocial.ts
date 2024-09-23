@@ -15,7 +15,7 @@ class RedeSocial{
     adicionarUsuario(usuario: Usuario): void{
         // 2 - b.i
         if(this._usuarios.some(u => u.id === usuario.id || u.email === usuario.email)){
-            throw new UsuarioJaCadastradoError("Usuário com o mesmo ID ou e-mail já cadastrado.");
+            throw new UsuarioJaCadastradoError("\n!!! Usuário com o mesmo ID ou e-mail já cadastrado.\n");
         }
         
         this._usuarios.push(usuario);
@@ -40,6 +40,7 @@ class RedeSocial{
                 break;
             }
         }
+        
         if (usuarioProcurado == null) {
             throw new UsuarioNaoEncontradoError(`\n!!! Usuário não encontrado com e-mail: ${email}\n`);
         }
@@ -61,7 +62,7 @@ class RedeSocial{
         this._publicacoes.push(publicacao);
     }
 
-    // 2 - a - consulta(publicação)
+    // 2 - a - consulta(publicação por id)
     consultarPublicacaoPorId(id: number): Publicacao {
         let publicacaoProcurada!: Publicacao;
         for (let i: number = 0; i < this._publicacoes.length; i++) {
@@ -78,6 +79,7 @@ class RedeSocial{
         return publicacaoProcurada;
     }
 
+    // 2 - a - consulta(publicação por indice)
     consultarPublicacaoPorIndice(numero: number): number {
         let indiceProcurado: number = -1;
         for (let i: number = 0; i < this._publicacoes.length; i++) {
@@ -88,7 +90,7 @@ class RedeSocial{
         }
 
         if (indiceProcurado == -1) {
-            throw new PublicacaoNaoEncontradaOuInvalidaError(`\nPublicação não encontrada: ${numero}`);
+            throw new PublicacaoNaoEncontradaOuInvalidaError(`\n!!! Publicação NÃO encontrada: ${numero}\n`);
         }
 
         return indiceProcurado;
@@ -103,15 +105,11 @@ class RedeSocial{
         return publisOrdenadas;
     }
     
-
     //2 - d
     listarPublicacoesPorUsuario(email: string, exibir: boolean = true): Publicacao[] {
-        const usuario = this._usuarios.find(u => u.email === email);
-        if (!usuario) {
-            throw new UsuarioNaoEncontradoError("Usuário não encontrado.");
-        }
-
-        const publicacoesUsuario = this._publicacoes.filter(p => p.usuario.email === email);
+        const usuario = this.consultarUsuarioPorEmail(email);
+        
+        const publicacoesUsuario = this._publicacoes.filter(p => p.usuario.id === usuario.id);
         const publicacoesOrdenadas = publicacoesUsuario.sort((a, b) => b.dataHora.getTime() - a.dataHora.getTime());
 
         if (exibir) {
@@ -119,7 +117,7 @@ class RedeSocial{
                 console.log(`\nId Publicação: ${pub.id}`);
                 console.log(`Conteúdo: ${pub.conteudo}`);
                 console.log(`Data de Publicação: ${pub.dataHora.toLocaleString()}`);
-                console.log(`Usuario: ${pub.usuario.apelido}`);
+                console.log(`Apelido: ${pub.usuario.apelido}`);
                 
                 if (pub instanceof PublicacaoAvancada) {
                     const reacoes = pub['_interacoes'].map((interacao: Interacao) => interacao.tipoInteracao);
