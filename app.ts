@@ -65,10 +65,13 @@ class AppRedeSocial {
                     case "9":
                         this.transformarPublicacaoEmAvançada();
                         break;
+                    case "10":
+                        this.excluirPublicacao();
+                        break;
                 }
             } catch (e) {
                 if (e instanceof AplicacaoError) {
-                    console.log(e.message); // "Ocorreu um erro na aplicação!"
+                    console.log(e.message);
                 } else {
                     console.log("Erro desconhecido. Contate o administrador", e);
                 }
@@ -86,9 +89,10 @@ class AppRedeSocial {
         console.log("4️⃣  - 💬 Interagir com Publicação");
         console.log("5️⃣  - 👥 Listar Usuários");
         console.log("6️⃣  - 🔍 Ver Publicações de um Usuário");
-        console.log("7️⃣  - ✏️ Editar Publicação");
+        console.log("7️⃣  - ✏️  Editar Publicação");
         console.log("8️⃣  - 🔄 Ativar/Desativar Usuário");
         console.log("9️⃣  - 🔓 Liberar Interações");
+        console.log("🔟 - 🗑️  Excluir Publicação");
         console.log("0️⃣  - 🚪 Sair");
 
     }
@@ -211,7 +215,7 @@ class AppRedeSocial {
     
     // menu - opcao 4
     private interagirComPublicacao() {
-        console.log("\n💬  Interagir\n");
+        console.log("\n# 💬  Interagir\n");
         this.listarPublicacoesAvancadas();
         const idPublicacao = this._input("Digite o ID da publicação: ");
         const emailUsuario = this._input("Digite o email do usuário que está interagindo: ");
@@ -236,7 +240,7 @@ class AppRedeSocial {
 
     // menu - opcao 5
     private listarUsuarios() {
-        console.log("\n👥 Listar Usuários\n");
+        console.log("\n# 👥 Listar Usuários\n");
         for (let usuario of this._redeSocial.usuarios) {
             console.log(`${usuario.ativo ? "✔️​  Ativo" : "❌​ Inativo"} - Id: ${usuario.id} - Email: ${usuario.email} - Apelido: ${usuario.apelido} - Documento: ${usuario.documento}`);
         }
@@ -252,7 +256,7 @@ class AppRedeSocial {
 
     // menu - opcao 7
     private editarPublicacao() {
-        console.log("\n✏️  Editar Publicação\n");
+        console.log("\n# ✏️  Editar Publicação\n");
         const idPublicacao = parseInt(this._input("Digite o ID da publicação que deseja editar: "));
         const publicacao = this._redeSocial.consultarPublicacaoPorId(idPublicacao);
 
@@ -267,7 +271,7 @@ class AppRedeSocial {
 
     // menu - opcao 8
     private alterarStatusUsuario() {
-        console.log("\n🔄 Ativar/Desativar Usuário\n");
+        console.log("\n# 🔄 Ativar/Desativar Usuário\n");
 
         const emailUsuario = this._input("Digite o email do usuário que deseja alterar: ");
         const usuario = this._redeSocial.consultarUsuarioPorEmail(emailUsuario);
@@ -281,7 +285,7 @@ class AppRedeSocial {
 
     // menu - opção 9
     private transformarPublicacaoEmAvançada() {
-        console.log("\n🔄 Transformar Publicação em Avançada\n");
+        console.log("\n# 🔄 Transformar Publicação em Avançada\n");
         
        this.listarPublicacoesSimples();
 
@@ -291,6 +295,20 @@ class AppRedeSocial {
         
         console.log("\n✅ Publicação transformada em avançada com sucesso!");
 
+    }
+
+    // menu - opcao 10
+    private excluirPublicacao() {
+        console.log("\n# 🗑️  Excluir Publicação\n");
+    
+        const idPublicacao = parseInt(this._input("Digite o ID da publicação a ser excluída: "));
+        const publicacao = this._redeSocial.consultarPublicacaoPorId(idPublicacao);
+        const emailUsuario = this._input("Digite o email do usuário que deseja excluir a publicação: ");
+        const usuario = this._redeSocial.consultarUsuarioPorEmail(emailUsuario);
+    
+        this._redeSocial.excluirPublicacao(publicacao, usuario.id);
+
+        console.log("\n✅ Publicação excluída com sucesso!");
     }
     
     public carregarUsuarios() {
@@ -347,7 +365,7 @@ class AppRedeSocial {
             let publicacao!: Publicacao;
             const idPublicação = parseInt(linhaPublicacao[1]);
 
-            const usuario: Usuario = this._redeSocial.consultarUsuarioPorId(parseInt(linhaPublicacao[1]));
+            const usuario: Usuario = this._redeSocial.consultarUsuarioPorId(parseInt(linhaPublicacao[2]));
 
             let tipo: string = linhaPublicacao[0];
 
@@ -362,7 +380,7 @@ class AppRedeSocial {
                 this._idPublicacao = idPublicação + 1;
             }
 
-            this._redeSocial.adicionarPublicacao(publicacao);
+            this._redeSocial.adicionarPublicacao(publicacao, true);
 
             console.log(`Publicaçao ${publicacao.id} carregada!`);
         }

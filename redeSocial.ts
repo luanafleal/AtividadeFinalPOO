@@ -4,6 +4,7 @@ import {
     PublicacaoJaCadastradaError, PublicacaoNaoEncontradaOuInvalidaError , UsuarioJaReagiuError,
     UsuarioSemPermissaoError, PublicacaoJaEhAvancadaError, UsuarioInativoError
 } from "./excecoes";
+import { error } from "console";
 
 // 2. a 
 class RedeSocial{
@@ -47,10 +48,14 @@ class RedeSocial{
     }
 
     // 2. a - inclusão(publicação)
-    adicionarPublicacao(publicacao: Publicacao): void {
-        // 2 - b.i
+    adicionarPublicacao(publicacao: Publicacao, carregandoArquivo = false): void {
+        // 2 - b.
+        if (!publicacao.usuario.ativo && !carregandoArquivo) {
+            throw new UsuarioInativoError(`\n!!! Usuario está inativo: ${publicacao.usuario.email}\n`);
+        }
+
         if(this._publicacoes.some(p => p.id === publicacao.id)){
-            throw new PublicacaoJaCadastradaError("Publicação com ID já cadastrado.");
+            throw new PublicacaoJaCadastradaError("\n!!! Publicação com ID já cadastrado.\n");
         }
         
         this._publicacoes.push(publicacao);
@@ -154,8 +159,11 @@ class RedeSocial{
 
     // 3
     editarPublicacao(publicacao: Publicacao, novoConteudo: string, usuario: Usuario): void {
+        if (!usuario.ativo) {
+            throw new UsuarioInativoError(`\n!!! Usuario está inativo: ${usuario.email}\n`);
+        }
         if (publicacao.usuario.email !== usuario.email) {
-            throw new UsuarioSemPermissaoError("\nErro: Usuário não tem permissão para editar esta publicação.");
+            throw new UsuarioSemPermissaoError("\n!!! Erro: Usuário não tem permissão para editar esta publicação.\n");
         }
 
         // Utiliza o método para alterar o conteúdo
@@ -182,6 +190,17 @@ class RedeSocial{
         }
     }
 
+    // 3
+    excluirPublicacao(publicacao: Publicacao, idUsuario: number): void {
+        // Verifica se o usuário que está tentando excluir é o autor da publicação
+        if (publicacao.usuario.id !== idUsuario) {
+            throw new UsuarioSemPermissaoError("\n!!! Ação não permitida. Apenas o autor pode excluir a publicação.\n");
+        }
+
+        this._publicacoes = this._publicacoes.filter(p => p.id !== publicacao.id);
+    }
+
+    // 3
     alterarStatusUsuario(usuario: Usuario): void {
         usuario.ativo = !usuario.ativo;
     }
