@@ -4,12 +4,14 @@ class Usuario {
     private _email: string;
     private _apelido: string;
     private _documento: string;
+    private _ativo: boolean;
 
-    constructor (id: number, email: string, apelido: string, documento: string) {
+    constructor (id: number, email: string, apelido: string, documento: string, ativo: boolean) {
         this._id = id;
         this._email = email;
         this._apelido = apelido;
         this._documento = documento;
+        this._ativo = ativo;
     }
 
     get id(): number {
@@ -26,6 +28,14 @@ class Usuario {
     
     get documento(): string {
         return this._documento;
+    }
+
+    get ativo(): boolean {
+        return this._ativo;
+    }
+
+    set ativo(status: boolean) {
+        this._ativo = status;
     }
 }
 

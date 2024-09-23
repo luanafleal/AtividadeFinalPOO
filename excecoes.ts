@@ -70,4 +70,15 @@ class PublicacaoJaEhAvancadaError extends AplicacaoError {
     }
 }
 
-export {AplicacaoError, UsuarioJaCadastradoError, UsuarioNaoEncontradoPorIdError, PublicacaoJaCadastradaError, IdPublicacaoNaoEncontradoError, UsuarioNaoEncontradoError, PublicacaoNaoEncontradaOuInvalidaError, UsuarioJaReagiuError, UsuarioSemPermissaoError, PublicacaoJaEhAvancadaError}
+class UsuarioInativoError extends AplicacaoError {
+    constructor(message: string) {
+        super(message);
+        this.name = "UsuarioInativoError";
+    }
+}
+
+export {
+    AplicacaoError, UsuarioJaCadastradoError, UsuarioNaoEncontradoPorIdError, PublicacaoJaCadastradaError,
+    IdPublicacaoNaoEncontradoError, UsuarioNaoEncontradoError, PublicacaoNaoEncontradaOuInvalidaError,
+    UsuarioJaReagiuError, UsuarioSemPermissaoError, PublicacaoJaEhAvancadaError, UsuarioInativoError
+}

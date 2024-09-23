@@ -59,6 +59,9 @@ class AppRedeSocial {
                     case "7":
                         this.editarPublicacao();
                         break;
+                    case "8":
+                        this.alterarStatusUsuario();
+                        break;
                     case "9":
                         this.transformarPublicacaoEmAvançada();
                         break;
@@ -84,6 +87,7 @@ class AppRedeSocial {
         console.log("5️⃣  - 👥 Listar Usuários");
         console.log("6️⃣  - 🔍 Ver Publicações de um Usuário");
         console.log("7️⃣  - ✏️ Editar Publicação");
+        console.log("8️⃣  - 🔄 Ativar/Desativar Usuário");
         console.log("9️⃣  - 🔓 Liberar Interações");
         console.log("0️⃣  - 🚪 Sair");
 
@@ -97,7 +101,7 @@ class AppRedeSocial {
         let apelido = this._input("> Digite o apelido do usuário: ");
         let documento = this._input("> Digite o documento do usuário: ");
 
-        let usuario = new Usuario(this._idUsuario++, email, apelido, documento);
+        let usuario = new Usuario(this._idUsuario++, email, apelido, documento, true);
 
         this._redeSocial.adicionarUsuario(usuario);
         console.log("\n# 👤 Usuário cadastrado com sucesso!");
@@ -234,7 +238,7 @@ class AppRedeSocial {
     private listarUsuarios() {
         console.log("\n👥 Listar Usuários\n");
         for (let usuario of this._redeSocial.usuarios) {
-            console.log(`> Id: ${usuario.id} - Email: ${usuario.email} - Apelido: ${usuario.apelido} - Documento: ${usuario.documento}`);
+            console.log(`${usuario.ativo ? "✔️​  Ativo" : "❌​ Inativo"} - Id: ${usuario.id} - Email: ${usuario.email} - Apelido: ${usuario.apelido} - Documento: ${usuario.documento}`);
         }
 
         this.imprimirPressionarEnter();
@@ -261,6 +265,20 @@ class AppRedeSocial {
         console.log("\n✅ Publicação editada com sucesso!");
     }
 
+    // menu - opcao 8
+    private alterarStatusUsuario() {
+        console.log("\n🔄 Ativar/Desativar Usuário\n");
+
+        const emailUsuario = this._input("Digite o email do usuário que deseja alterar: ");
+        const usuario = this._redeSocial.consultarUsuarioPorEmail(emailUsuario);
+
+        this._redeSocial.alterarStatusUsuario(usuario);
+
+        const novoStatus = usuario.ativo ? "ativo" : "inativo";
+
+        console.log(`\n✅ O usuário agora está ${novoStatus}.`);
+    }
+
     // menu - opção 9
     private transformarPublicacaoEmAvançada() {
         console.log("\n🔄 Transformar Publicação em Avançada\n");
@@ -285,7 +303,7 @@ class AppRedeSocial {
         for (let i: number = 0; i < linhas.length; i++) {
             let linhaUsuario: string[] = linhas[i].trim().split(",");
             // Verifica se a linha tem o número esperado de colunas
-            if (linhaUsuario.length < 4) {
+            if (linhaUsuario.length < 5) {
                 
                 console.warn(`Linha mal formatada: ${linhas[i]}`);
                 continue; // Pular linha mal formatada
@@ -293,7 +311,9 @@ class AppRedeSocial {
 
             let usuario!: Usuario;
             const id = parseInt(linhaUsuario[0]);
-            usuario = new Usuario(id, linhaUsuario[1], linhaUsuario[2], linhaUsuario[3]);
+            const ativo = linhaUsuario[4] == 'true'
+
+            usuario = new Usuario(id, linhaUsuario[1], linhaUsuario[2], linhaUsuario[3], ativo);
             
             if (id >= this._idUsuario) {
                 this._idUsuario = id + 1;
@@ -402,7 +422,7 @@ class AppRedeSocial {
         let dadosInteracoes = "";
         this._redeSocial.usuarios.forEach((usuario) => {
             // Salvando os dados do usuário
-            dadosUsuarios += `${usuario.id},${usuario.email},${usuario.apelido},${usuario.documento}\n`;
+            dadosUsuarios += `${usuario.id},${usuario.email},${usuario.apelido},${usuario.documento},${usuario.ativo}\n`;
 
             // Salvando as publicações do usuário
             const publicacoes = this._redeSocial.listarPublicacoesPorUsuario(usuario.email, false); // Adicione false para não imprimir

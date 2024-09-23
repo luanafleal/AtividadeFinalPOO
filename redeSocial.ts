@@ -2,7 +2,7 @@ import { Usuario, Publicacao , PublicacaoAvancada, TipoInteracao, Interacao } fr
 import {
     UsuarioJaCadastradoError, UsuarioNaoEncontradoPorIdError, UsuarioNaoEncontradoError,
     PublicacaoJaCadastradaError, PublicacaoNaoEncontradaOuInvalidaError , UsuarioJaReagiuError,
-    UsuarioSemPermissaoError, PublicacaoJaEhAvancadaError
+    UsuarioSemPermissaoError, PublicacaoJaEhAvancadaError, UsuarioInativoError
 } from "./excecoes";
 
 // 2. a 
@@ -132,8 +132,12 @@ class RedeSocial{
     reagirPublicacao(idInteracao: number, usuario: Usuario, publicacaoId: number, tipoReacao: TipoInteracao): void {
         const publicacao = this.consultarPublicacaoPorId(publicacaoId);
         if (publicacao instanceof PublicacaoAvancada) {
+            if (!usuario.ativo) {
+                throw new UsuarioInativoError(`\n!!! Usuario está inativo: ${usuario.email}\n`);
+            }
+
             if (publicacao.interacoes.some((interacao: Interacao) => interacao.usuario.id === usuario.id)) {
-                throw new UsuarioJaReagiuError("Usuário já reagiu a esta publicação.");
+                throw new UsuarioJaReagiuError("\n!!! Usuário já reagiu a esta publicação.\n");
             }
             const novaInteracao = new Interacao(
                 idInteracao,
@@ -159,7 +163,7 @@ class RedeSocial{
     }
 
     // 3
-    transformarPublicacaoEmAvancada(publicacaoId: number) {
+    transformarPublicacaoEmAvancada(publicacaoId: number): void {
         const publicacao = this.consultarPublicacaoPorId(publicacaoId);
 
         // Verificar se a publicação já é avançada
@@ -176,6 +180,10 @@ class RedeSocial{
         if (indice != -1) {
             this._publicacoes[indice] = publicacaoAvancada;
         }
+    }
+
+    alterarStatusUsuario(usuario: Usuario): void {
+        usuario.ativo = !usuario.ativo;
     }
 
     // Getters
